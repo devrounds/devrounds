@@ -2,3 +2,7 @@ devrounds.exe
 dist/
 .env
 npm/vendor/
+pypi/dist/
+pypi/build/
+*.egg-info/
+__pycache__/

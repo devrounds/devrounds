@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devrounds"
+dynamic = ["version"]
+description = "One local CLI that runs a round of checks on any repo or dev machine."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+keywords = ["cli", "developer-tools", "env", "readiness"]
+
+[project.scripts]
+devrounds = "devrounds.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/devrounds/devrounds"
+Repository = "https://github.com/devrounds/devrounds"
+
+[tool.setuptools.dynamic]
+version = { attr = "devrounds.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

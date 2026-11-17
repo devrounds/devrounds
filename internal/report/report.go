@@ -1,6 +1,9 @@
 package report
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Status int
 
@@ -25,16 +28,21 @@ type Result struct {
 	Name    string
 	Message string
 	Details []string
+	Next    string
 }
 
 // Print writes the report and returns true when there is no FAIL.
 func Print(title string, results []Result) bool {
 	fmt.Printf("%s\n\n", title)
 	issues, fails := 0, 0
+	var hints []string
 	for _, r := range results {
 		fmt.Printf("%-5s %-9s %s\n", r.Status, r.Name, r.Message)
 		for _, d := range r.Details {
 			fmt.Printf("%16s- %s\n", "", d)
+		}
+		if r.Next != "" {
+			hints = append(hints, r.Next)
 		}
 		switch r.Status {
 		case Warn:
@@ -56,6 +64,9 @@ func Print(title string, results []Result) bool {
 		fmt.Printf("Result: READY with %d %s\n", issues, word)
 	default:
 		fmt.Println("Result: READY")
+	}
+	if len(hints) > 0 {
+		fmt.Printf("Next: %s\n", strings.Join(hints, ", then "))
 	}
 	return fails == 0
 }

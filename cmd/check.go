@@ -1,19 +1,16 @@
 package cmd
 
-import (
-"fmt"
-
-"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 var checkCmd = &cobra.Command{
-Use:   "check",
-Short: "Readiness checks: runtime, binaries, ports, services",
-Run: func(cmd *cobra.Command, args []string) {
-fmt.Println("check: not implemented yet")
-},
+	Use:   "check [path]",
+	Short: "Readiness checks: runtime, binaries, ports, services",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		runChecks("Check", args)
+	},
 }
 
 func init() {
-rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(checkCmd)
 }

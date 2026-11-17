@@ -2,7 +2,7 @@
 
 One local CLI that does a "round" of checks on any repo or dev machine and gives a single verdict on whether a project is ready to run.
 
-> Early development (v0.1). `round`, `check` and `env` work today. `map`, `scan`, `story` and `flow` are planned.
+> Early development (v0.1). `round`, `check`, `env` and `map` work today. `scan`, `story` and `flow` are planned.
 
 ## Install
 
@@ -24,6 +24,7 @@ Or download a binary for Linux, macOS or Windows from the [Releases page](https:
     devrounds round [path] # check + env in one pass, one verdict
     devrounds check [path] # readiness checks
     devrounds env [path]   # environment-variable drift
+    devrounds map          # what is listening on which port
 
 Example:
 
@@ -53,6 +54,9 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Names in `.env.example` that no code uses
 - Names referenced in GitHub Actions workflows but missing locally
 
+`map`
+- Every listening TCP port with its process name, PID and the folder the process was started from (`--json` supported)
+
 ## Rules
 
 - Never prints secret values. Names and file locations only.
@@ -64,9 +68,10 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Node and Python projects only for now.
 - Environment variables are found by pattern matching, so dynamically built names are missed, and so are variables read by tools outside the scanned `.js`, `.ts` and `.py` files.
 - Compose ports that use variables or ranges are skipped.
-- Process names for some system processes may be hidden on Windows.
+- Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 

@@ -7,5 +7,6 @@ func Run(dir string) []report.Result {
 	var results []report.Result
 	results = append(results, Runtime(dir)...)
 	results = append(results, Binaries(dir)...)
+	results = append(results, Ports(dir)...)
 	return results
 }

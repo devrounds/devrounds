@@ -10,6 +10,12 @@ import (
 	"github.com/devrounds/devrounds/internal/report"
 )
 
+var jsonOutput bool
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, "print the report as JSON")
+}
+
 func projectDir(args []string) string {
 	dir := "."
 	if len(args) > 0 {
@@ -36,7 +42,14 @@ func runReport(verb string, args []string, withChecks, withEnv bool) {
 	if withEnv {
 		results = append(results, envdrift.Run(dir)...)
 	}
-	if !report.Print(fmt.Sprintf("%s on %s", verb, filepath.Base(dir)), results) {
+	title := fmt.Sprintf("%s on %s", verb, filepath.Base(dir))
+	var ok bool
+	if jsonOutput {
+		ok = report.PrintJSON(title, results)
+	} else {
+		ok = report.Print(title, results)
+	}
+	if !ok {
 		os.Exit(1)
 	}
 }

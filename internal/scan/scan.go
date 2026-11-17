@@ -245,6 +245,7 @@ func Run(dir string) Report {
 	scanContainers(dir, &r)
 	if !node && !py {
 		r.Types = append(r.Types, "Other (generic fallback)")
+		scanFallback(dir, &r)
 	}
 	checkDocs(dir, &r, node || py)
 	return r

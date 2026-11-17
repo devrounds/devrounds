@@ -10,8 +10,7 @@ var roundCmd = &cobra.Command{
 }
 
 func runRound(cmd *cobra.Command, args []string) {
-	// env checks will join here later
-	runChecks("Round", args)
+	runReport("Round", args, true, true)
 }
 
 func init() {

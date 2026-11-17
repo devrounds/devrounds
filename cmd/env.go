@@ -1,16 +1,13 @@
 package cmd
 
-import (
-	"fmt"
-
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 var envCmd = &cobra.Command{
-	Use:   "env",
+	Use:   "env [path]",
 	Short: "Environment-variable drift between code, .env.example, Docker and CI",
+	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("env: not implemented yet")
+		runReport("Env", args, false, true)
 	},
 }
 

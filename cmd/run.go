@@ -6,10 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/devrounds/devrounds/internal/checks"
+	"github.com/devrounds/devrounds/internal/envdrift"
 	"github.com/devrounds/devrounds/internal/report"
 )
 
-func runChecks(verb string, args []string) {
+func projectDir(args []string) string {
 	dir := "."
 	if len(args) > 0 {
 		dir = args[0]
@@ -23,8 +24,19 @@ func runChecks(verb string, args []string) {
 		fmt.Fprintf(os.Stderr, "not a directory: %s\n", abs)
 		os.Exit(2)
 	}
-	results := checks.Run(abs)
-	if !report.Print(fmt.Sprintf("%s on %s", verb, filepath.Base(abs)), results) {
+	return abs
+}
+
+func runReport(verb string, args []string, withChecks, withEnv bool) {
+	dir := projectDir(args)
+	var results []report.Result
+	if withChecks {
+		results = append(results, checks.Run(dir)...)
+	}
+	if withEnv {
+		results = append(results, envdrift.Run(dir)...)
+	}
+	if !report.Print(fmt.Sprintf("%s on %s", verb, filepath.Base(dir)), results) {
 		os.Exit(1)
 	}
 }

@@ -24,6 +24,7 @@ type Result struct {
 	Status  Status
 	Name    string
 	Message string
+	Details []string
 }
 
 // Print writes the report and returns true when there is no FAIL.
@@ -32,6 +33,9 @@ func Print(title string, results []Result) bool {
 	issues, fails := 0, 0
 	for _, r := range results {
 		fmt.Printf("%-5s %-9s %s\n", r.Status, r.Name, r.Message)
+		for _, d := range r.Details {
+			fmt.Printf("%16s- %s\n", "", d)
+		}
 		switch r.Status {
 		case Warn:
 			issues++

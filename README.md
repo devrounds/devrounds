@@ -6,7 +6,15 @@ One local CLI that does a "round" of checks on any repo or dev machine and gives
 
 ## Install
 
-Requires Go. Until binary releases exist, install from source:
+Pick one:
+
+    npm install -g devrounds
+
+    pip install devrounds
+
+The npm and pip packages are thin wrappers. They download the prebuilt release binary for your platform and verify its checksum.
+
+Or download a binary for Linux, macOS or Windows from the [Releases page](https://github.com/devrounds/devrounds/releases). Or, with Go installed:
 
     go install github.com/devrounds/devrounds@latest
 
@@ -61,3 +69,4 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 ## License
 
 MIT
+

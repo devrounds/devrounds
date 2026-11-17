@@ -13,15 +13,16 @@ var scanCmd = &cobra.Command{
 	Short: "Takeover report for an unfamiliar repo",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		r := scan.Run(projectDir(args))
+		dir := projectDir(args)
+		full := scan.Full{Report: scan.Run(dir), Risks: scan.Risks(dir)}
 		if jsonOutput {
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetEscapeHTML(false)
 			enc.SetIndent("", "  ")
-			_ = enc.Encode(r)
+			_ = enc.Encode(full)
 			return
 		}
-		scan.PrintText(os.Stdout, r)
+		scan.PrintFull(os.Stdout, full)
 	},
 }
 

@@ -11,7 +11,7 @@ var rootCmd = &cobra.Command{
 	Use:     "devrounds",
 	Short:   "Run a round of checks on any repo or dev machine",
 	Long:    "devrounds runs a local round of checks and gives one verdict on whether a project is ready to run.",
-	Version: "0.1.0",
+	Version: version,
 	Run:     runRound,
 }
 

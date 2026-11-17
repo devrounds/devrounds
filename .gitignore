@@ -1,3 +1,4 @@
 devrounds.exe
 dist/
 .env
+npm/vendor/

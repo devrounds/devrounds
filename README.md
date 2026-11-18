@@ -63,6 +63,7 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Gaps: missing README, LICENSE, pinned runtime, env documentation or CI
 - Risks: secret-looking files that are committed (by file name only, contents are never read) and debug flags left on
 - History: commit count, last activity, top contributors (names only, never emails) and the folders changed most in the last 90 days
+- Dependencies: versions that accept anything, packages installed from a URL or git, a missing lockfile, and pinned Node or Python versions at or near end of life (static rules only, no registry lookups)
 - `--json` supported
 
 ## Rules
@@ -76,13 +77,14 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Node and Python projects only for now.
 - Environment variables are found by pattern matching, so dynamically built names are missed, and so are variables read by tools outside the scanned `.js`, `.ts` and `.py` files.
 - Compose ports that use variables or ranges are skipped.
-- `scan` does not report dependency risks yet.
+- `scan` cannot tell whether a package is outdated, because that needs a registry lookup and devrounds makes no network calls. It checks pins, lockfiles and end-of-life runtimes instead. `pyproject.toml` dependencies are not analyzed yet, and the end-of-life dates come from a built-in table.
 - Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 
 

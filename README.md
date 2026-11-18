@@ -2,7 +2,7 @@
 
 One local CLI that does a "round" of checks on any repo or dev machine and gives a single verdict on whether a project is ready to run.
 
-> Early development (v0.1). `round`, `check`, `env` and `map` work today. `scan`, `story` and `flow` are planned.
+> Early development (v0.2). `round`, `check`, `env`, `map` and `scan` work today. `story` and `flow` are planned.
 
 ## Install
 
@@ -25,6 +25,7 @@ Or download a binary for Linux, macOS or Windows from the [Releases page](https:
     devrounds check [path] # readiness checks
     devrounds env [path]   # environment-variable drift
     devrounds map          # what is listening on which port
+    devrounds scan [path]  # takeover report for an unfamiliar repo
 
 Example:
 
@@ -57,6 +58,12 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 `map`
 - Every listening TCP port with its process name, PID and the folder the process was started from (`--json` supported)
 
+`scan`
+- Project type, pinned runtime, entry points and likely run commands. Other kinds of project fall back to commands found in Docker, Compose and Makefile files, CI config and the README
+- Gaps: missing README, LICENSE, pinned runtime, env documentation or CI
+- Risks: secret-looking files that are committed (by file name only, contents are never read) and debug flags left on
+- `--json` supported
+
 ## Rules
 
 - Never prints secret values. Names and file locations only.
@@ -68,10 +75,13 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Node and Python projects only for now.
 - Environment variables are found by pattern matching, so dynamically built names are missed, and so are variables read by tools outside the scanned `.js`, `.ts` and `.py` files.
 - Compose ports that use variables or ranges are skipped.
+- `scan` does not report dependency risks or git history yet.
+- Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 

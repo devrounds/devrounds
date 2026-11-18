@@ -16,14 +16,15 @@ var scanCmd = &cobra.Command{
 		dir := projectDir(args)
 		full := scan.Full{Report: scan.Run(dir), Risks: scan.Risks(dir), History: scan.Git(dir)}
 		all := scan.Complete{Full: full, Deps: scan.Deps(dir)}
+		brief := scan.Brief(all)
 		if jsonOutput {
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetEscapeHTML(false)
 			enc.SetIndent("", "  ")
-			_ = enc.Encode(all)
+			_ = enc.Encode(brief)
 			return
 		}
-		scan.PrintComplete(os.Stdout, all)
+		scan.PrintBriefing(os.Stdout, brief)
 	},
 }
 

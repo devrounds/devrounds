@@ -14,7 +14,7 @@ var scanCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		dir := projectDir(args)
-		full := scan.Full{Report: scan.Run(dir), Risks: scan.Risks(dir)}
+		full := scan.Full{Report: scan.Run(dir), Risks: scan.Risks(dir), History: scan.Git(dir)}
 		if jsonOutput {
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetEscapeHTML(false)

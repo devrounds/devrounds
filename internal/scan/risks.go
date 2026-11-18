@@ -17,7 +17,8 @@ import (
 // Full is the scan report plus the risk findings.
 type Full struct {
 	Report
-	Risks []string `json:"risks"`
+	Risks   []string `json:"risks"`
+	History *History `json:"history,omitempty"`
 }
 
 var riskSkip = map[string]bool{
@@ -174,6 +175,7 @@ func Risks(dir string) []string {
 // PrintFull writes the scan report followed by the risk findings.
 func PrintFull(w io.Writer, f Full) {
 	PrintText(w, f.Report)
+	printHistory(w, f.History)
 	if len(f.Risks) == 0 {
 		fmt.Fprintf(w, "%-9s nothing obvious\n", "Risks")
 		return

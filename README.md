@@ -62,6 +62,7 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Project type, pinned runtime, entry points and likely run commands. Other kinds of project fall back to commands found in Docker, Compose and Makefile files, CI config and the README
 - Gaps: missing README, LICENSE, pinned runtime, env documentation or CI
 - Risks: secret-looking files that are committed (by file name only, contents are never read) and debug flags left on
+- History: commit count, last activity, top contributors (names only, never emails) and the folders changed most in the last 90 days
 - `--json` supported
 
 ## Rules
@@ -75,13 +76,14 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Node and Python projects only for now.
 - Environment variables are found by pattern matching, so dynamically built names are missed, and so are variables read by tools outside the scanned `.js`, `.ts` and `.py` files.
 - Compose ports that use variables or ranges are skipped.
-- `scan` does not report dependency risks or git history yet.
+- `scan` does not report dependency risks yet.
 - Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 
 

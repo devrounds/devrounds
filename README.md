@@ -2,7 +2,7 @@
 
 One local CLI that does a "round" of checks on any repo or dev machine and gives a single verdict on whether a project is ready to run.
 
-> Early development (v0.2). `round`, `check`, `env`, `map` and `scan` work today. `story` and `flow` are planned.
+> Early development (v0.3). `round`, `check`, `env`, `map`, `scan` and `story` work today. `flow` is planned.
 
 ## Install
 
@@ -26,6 +26,7 @@ Or download a binary for Linux, macOS or Windows from the [Releases page](https:
     devrounds env [path]   # environment-variable drift
     devrounds map          # what is listening on which port
     devrounds scan [path]  # takeover report for an unfamiliar repo
+    devrounds story [path] # work log from git history
 
 Example:
 
@@ -67,6 +68,11 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Start and Ask: up to five read-only commands to try first and questions for the previous maintainer, chosen from what the scan found (devrounds only suggests commands, it never runs them)
 - `--json` for machine-readable output, `--markdown` for a Markdown document, and `--out <file>` to write the report to a file as UTF-8
 
+`story`
+- Non-merge commits in a date range (`--since 7d`, `2w` or a date, optional `--until`). By default only yours, matched by your git `user.email`; `--all` and `--author` change that
+- Grouped by area (the top-level folder most changed files are in) or by day (`--by day`), printed as text, Markdown or a short standup (`--format text|markdown|standup`); `--json` supported
+- Fixed grouping rules only, no AI. Read-only: it just runs git log
+
 ## Rules
 
 - Never prints secret values. Names and file locations only.
@@ -80,12 +86,14 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Compose ports that use variables or ranges are skipped.
 - `scan` cannot tell whether a package is outdated, because that needs a registry lookup and devrounds makes no network calls. It checks pins, lockfiles and end-of-life runtimes instead. `pyproject.toml` dependencies are not analyzed yet, and the end-of-life dates come from a built-in table.
 - The commands and questions in `scan` come from simple rules. Treat them as a starting point, not an audit.
+- `story` puts each commit in the folder where most of its files changed, so release and version-bump commits can land in an unexpected area. Commit subjects are shown as written, so read the log before sharing it.
 - Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 
 

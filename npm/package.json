@@ -1,6 +1,6 @@
 {
   "name": "devrounds",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "One local CLI that runs a round of checks on any repo or dev machine.",
   "license": "MIT",
   "bin": {
@@ -25,4 +25,5 @@
   },
   "homepage": "https://github.com/devrounds/devrounds"
 }
+
 

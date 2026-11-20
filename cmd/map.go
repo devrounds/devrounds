@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"text/tabwriter"
 
 	"github.com/devrounds/devrounds/internal/portmap"
 	"github.com/spf13/cobra"
@@ -20,28 +19,15 @@ var mapCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, "devrounds: could not read listening ports:", err)
 			os.Exit(1)
 		}
+		containers, docker := portmap.Containers()
+		rep := portmap.Build(entries, containers, docker)
 		if jsonOutput {
-			if entries == nil {
-				entries = []portmap.Entry{}
-			}
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetIndent("", "  ")
-			_ = enc.Encode(entries)
+			_ = enc.Encode(rep)
 			return
 		}
-		tw := tabwriter.NewWriter(os.Stdout, 0, 8, 2, ' ', 0)
-		fmt.Fprintln(tw, "PORT\tPROCESS\tPID\tFOLDER")
-		for _, e := range entries {
-			name, folder := e.Process, e.Folder
-			if name == "" {
-				name = "-"
-			}
-			if folder == "" {
-				folder = "-"
-			}
-			fmt.Fprintf(tw, "%d\t%s\t%d\t%s\n", e.Port, name, e.PID, folder)
-		}
-		tw.Flush()
+		portmap.PrintText(os.Stdout, rep)
 	},
 }
 

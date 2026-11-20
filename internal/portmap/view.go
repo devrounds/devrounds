@@ -8,10 +8,11 @@ type Row struct {
 
 // Report is everything map knows.
 type Report struct {
-	Ports      []Row        `json:"ports"`
-	Containers []Container  `json:"containers"`
-	Docker     bool         `json:"docker_available"`
-	Project    *ProjectInfo `json:"project,omitempty"`
+	Ports      []Row          `json:"ports"`
+	Containers []Container    `json:"containers"`
+	Docker     bool           `json:"docker_available"`
+	Project    *ProjectInfo   `json:"project,omitempty"`
+	Health     []HealthResult `json:"health,omitempty"`
 }
 
 // Build joins listening ports with the containers that publish them.

@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/devrounds/devrounds/internal/checks"
 	"github.com/devrounds/devrounds/internal/portmap"
 	"github.com/spf13/cobra"
+)
+
+var (
+	mapHealth     bool
+	mapHealthPath string
 )
 
 var mapCmd = &cobra.Command{
@@ -16,6 +22,10 @@ var mapCmd = &cobra.Command{
 	Short: "Show what is listening on which port; with a path, also port conflicts for that project",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if mapHealth && len(args) == 0 {
+			fmt.Fprintln(os.Stderr, "devrounds: --health needs a project path, for example: devrounds map . --health")
+			os.Exit(2)
+		}
 		entries, err := portmap.Listening()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "devrounds: could not read listening ports:", err)
@@ -35,6 +45,10 @@ var mapCmd = &cobra.Command{
 				Expected:  len(expected),
 				Conflicts: portmap.Conflicts(rep, dir, expected),
 			}
+			if mapHealth {
+				targets := portmap.HealthTargets(rep, expected)
+				rep.Health = portmap.CheckHealth(targets, mapHealthPath, 2*time.Second)
+			}
 		}
 
 		if jsonOutput {
@@ -48,5 +62,8 @@ var mapCmd = &cobra.Command{
 }
 
 func init() {
+	f := mapCmd.Flags()
+	f.BoolVar(&mapHealth, "health", false, "GET the health path on the project's own listening ports (needs a project path)")
+	f.StringVar(&mapHealthPath, "health-path", "/health", "path to request with --health")
 	rootCmd.AddCommand(mapCmd)
 }

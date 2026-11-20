@@ -14,7 +14,8 @@ func dash(s string) string {
 }
 
 // PrintText writes the ports table, the containers table when there are any,
-// the project's port conflicts when a project was given, and a note when Docker is missing.
+// the project's port conflicts and health checks when a project was given,
+// and a note when Docker is missing.
 func PrintText(w io.Writer, r Report) {
 	tw := tabwriter.NewWriter(w, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(tw, "PORT\tPROCESS\tPID\tFOLDER\tCONTAINER")
@@ -49,6 +50,18 @@ func PrintText(w io.Writer, r Report) {
 			for _, c := range p.Conflicts {
 				fmt.Fprintf(w, "  %d (%s) is held by %s\n", c.Port, c.Source, c.Holder)
 			}
+		}
+	}
+
+	if len(r.Health) > 0 {
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "Health checks (GET on 127.0.0.1, status code only):")
+		for _, h := range r.Health {
+			detail := ""
+			if h.Status > 0 {
+				detail = fmt.Sprintf(" (%d, %d ms)", h.Status, h.Millis)
+			}
+			fmt.Fprintf(w, "  %s  %s%s\n", h.URL, h.Verdict, detail)
 		}
 	}
 

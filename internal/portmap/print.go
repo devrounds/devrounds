@@ -3,7 +3,6 @@ package portmap
 import (
 	"fmt"
 	"io"
-	"os"
 	"text/tabwriter"
 )
 
@@ -14,7 +13,8 @@ func dash(s string) string {
 	return s
 }
 
-// PrintText writes the ports table, then the containers table when there are any.
+// PrintText writes the ports table, the containers table when there are any,
+// the project's port conflicts when a project was given, and a note when Docker is missing.
 func PrintText(w io.Writer, r Report) {
 	tw := tabwriter.NewWriter(w, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(tw, "PORT\tPROCESS\tPID\tFOLDER\tCONTAINER")
@@ -36,10 +36,24 @@ func PrintText(w io.Writer, r Report) {
 		}
 		tw.Flush()
 	}
+
+	if p := r.Project; p != nil {
+		fmt.Fprintln(w)
+		switch {
+		case p.Expected == 0:
+			fmt.Fprintf(w, "%s names no specific ports (looked in Compose files and .env.example).\n", p.Name)
+		case len(p.Conflicts) == 0:
+			fmt.Fprintf(w, "No port conflicts for %s (%d expected ports checked).\n", p.Name, p.Expected)
+		default:
+			fmt.Fprintf(w, "Port conflicts for %s:\n", p.Name)
+			for _, c := range p.Conflicts {
+				fmt.Fprintf(w, "  %d (%s) is held by %s\n", c.Port, c.Source, c.Holder)
+			}
+		}
+	}
+
 	if !r.Docker {
 		fmt.Fprintln(w)
 		fmt.Fprintln(w, "Docker was not found or is not running, so containers are not listed.")
 	}
 }
-
-var _ = os.Stdout

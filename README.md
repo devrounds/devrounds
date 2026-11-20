@@ -50,6 +50,8 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Required binaries (git, plus docker, node, npm or python when the project needs them)
 - Ports the project expects (from Compose files, `PORT`-style names in `.env.example`, or the Node/Python default) and which process holds them
 - `.env` against `.env.example`: missing or empty names
+- Packages: whether `node_modules` exists for Node projects (and that pnpm, yarn or bun is installed when the lockfile needs it), and whether a Python virtual environment exists or is active. It does not check which Python packages are installed
+- Docker Compose services: which services in your compose file are running (services behind a `profiles:` entry are skipped)
 
 `env`
 - Names used in code (`process.env.X`, `os.environ["X"]`, `os.getenv("X")`) but missing from `.env.example` and Docker/Compose files
@@ -87,12 +89,14 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - `scan` cannot tell whether a package is outdated, because that needs a registry lookup and devrounds makes no network calls. It checks pins, lockfiles and end-of-life runtimes instead. `pyproject.toml` dependencies are not analyzed yet, and the end-of-life dates come from a built-in table.
 - The commands and questions in `scan` come from simple rules. Treat them as a starting point, not an audit.
 - `story` puts each commit in the folder where most of its files changed, so release and version-bump commits can land in an unexpected area. Commit subjects are shown as written, so read the log before sharing it.
+- The Docker Compose check has only been tested against a stand-in docker command, not a real Docker install. A service that exits on purpose, such as a migration job, shows as not running.
 - Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 
 

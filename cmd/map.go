@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -15,6 +16,8 @@ import (
 var (
 	mapHealth     bool
 	mapHealthPath string
+	mapMarkdown   bool
+	mapOut        string
 )
 
 var mapCmd = &cobra.Command{
@@ -51,13 +54,31 @@ var mapCmd = &cobra.Command{
 			}
 		}
 
-		if jsonOutput {
-			enc := json.NewEncoder(os.Stdout)
+		var w io.Writer = os.Stdout
+		if mapOut != "" {
+			f, err := os.Create(mapOut)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "devrounds:", err)
+				os.Exit(1)
+			}
+			defer f.Close()
+			w = f
+		}
+
+		switch {
+		case jsonOutput:
+			enc := json.NewEncoder(w)
 			enc.SetIndent("", "  ")
 			_ = enc.Encode(rep)
-			return
+		case mapMarkdown:
+			home, _ := os.UserHomeDir()
+			portmap.PrintMarkdown(w, rep, home)
+		default:
+			portmap.PrintText(w, rep)
 		}
-		portmap.PrintText(os.Stdout, rep)
+		if mapOut != "" {
+			fmt.Fprintln(os.Stderr, "wrote", mapOut)
+		}
 	},
 }
 
@@ -65,5 +86,7 @@ func init() {
 	f := mapCmd.Flags()
 	f.BoolVar(&mapHealth, "health", false, "GET the health path on the project's own listening ports (needs a project path)")
 	f.StringVar(&mapHealthPath, "health-path", "/health", "path to request with --health")
+	f.BoolVar(&mapMarkdown, "markdown", false, "print the report as Markdown, with your home folder shown as ~")
+	f.StringVarP(&mapOut, "out", "o", "", "write the report to a file instead of the screen")
 	rootCmd.AddCommand(mapCmd)
 }

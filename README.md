@@ -24,7 +24,7 @@ Or download a binary for Linux, macOS or Windows from the [Releases page](https:
     devrounds round [path] # check + env in one pass, one verdict
     devrounds check [path] # readiness checks
     devrounds env [path]   # environment-variable drift
-    devrounds map          # what is listening on which port
+    devrounds map [path]   # what is listening on which port
     devrounds scan [path]  # takeover report for an unfamiliar repo
     devrounds story [path] # work log from git history
 
@@ -59,7 +59,11 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - Names referenced in GitHub Actions workflows but missing locally
 
 `map`
-- Every listening TCP port with its process name, PID and the folder the process was started from (`--json` supported)
+- Every listening TCP port with its process name, PID and the folder the process was started from
+- Running Docker containers (image, Compose project and service, published ports), and which container publishes each port
+- With a project path (`devrounds map .`): the ports that project names in its Compose files and `.env.example`, and which of them are held by something other than the project. Processes started inside the project folder and containers of its own Compose project count as the project
+- `--health` (needs a path): one GET on `127.0.0.1` for each of the project ports that is listening, status code only, never reading the response body. `--health-path` changes the path from `/health`. Well-known non-HTTP ports such as 5432 are skipped
+- `--markdown` and `--out <file>` write a report you can share: your home folder is shown as `~` and no environment values are included. `--json` prints an object with `ports`, `containers` and `docker_available`, plus `project` and `health` when a path is given
 
 `scan`
 - Project type, pinned runtime, entry points and likely run commands. Other kinds of project fall back to commands found in Docker, Compose and Makefile files, CI config and the README
@@ -90,12 +94,14 @@ The exit code is 1 when anything fails and 0 otherwise, so it works in CI.
 - The commands and questions in `scan` come from simple rules. Treat them as a starting point, not an audit.
 - `story` puts each commit in the folder where most of its files changed, so release and version-bump commits can land in an unexpected area. Commit subjects are shown as written, so read the log before sharing it.
 - The Docker Compose check has only been tested against a stand-in docker command, not a real Docker install. A service that exits on purpose, such as a migration job, shows as not running.
+- `map` matches a container to a project by its Compose project name, which defaults to the folder name, so a project started with a custom project name is not recognized as the project itself.
 - Secret detection is by file name only, so a secret inside an ordinarily named file is not found.
 - Process names and folders for system services and other users' processes may be hidden (shown as `-`), especially on Windows and macOS.
 
 ## License
 
 MIT
+
 
 
 

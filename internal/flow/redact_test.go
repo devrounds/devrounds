@@ -22,6 +22,7 @@ func TestRedact(t *testing.T) {
 		{"mycli --PASSWORD=x", "mycli --PASSWORD=<redacted>"},
 		{"echo my-key value", "echo my-key value"},
 		{"git log --key value", "git log --key <redacted>"},
+		{`echo "--token abc123"`, `echo "--token <redacted>`},
 		{"Connect-Thing -Password hunter2", "Connect-Thing -Password <redacted>"},
 		{`tool --api-key "my key" go`, `tool --api-key <redacted> go`},
 

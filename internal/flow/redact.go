@@ -20,7 +20,7 @@ var (
 	// API_KEY=value, DB_PASSWORD="value", Authorization="Bearer x"
 	assignRe = regexp.MustCompile(`(?i)\b([A-Za-z0-9_]*` + secretWords + `[A-Za-z0-9_]*)=("[^"]*"|'[^']*'|\S+)`)
 	// --password value, --token=value, -Password value
-	flagRe = regexp.MustCompile(`(?i)(^|\s)(--?(?:password|passwd|pwd|pass|token|secret|secret[-_]?key|api[-_]?key|access[-_]?key|auth|authorization|credentials?|bearer|key))([=:\s]+)("[^"]*"|'[^']*'|\S+)`)
+	flagRe = regexp.MustCompile(`(?i)(^|[\s"'])(--?(?:password|passwd|pwd|pass|token|secret|secret[-_]?key|api[-_]?key|access[-_]?key|auth|authorization|credentials?|bearer|key))([=:\s]+)("[^"]*"|'[^']*'|\S+)`)
 	// Well-known token formats, wherever they appear.
 	knownTokenRe = regexp.MustCompile(`gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|npm_[A-Za-z0-9]{20,}|pypi-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}|sk_(?:live|test)_[A-Za-z0-9]{10,}|sk-[A-Za-z0-9_-]{20,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}`)
 	longWordRe   = regexp.MustCompile(`[A-Za-z0-9+/=_-]{32,}`)

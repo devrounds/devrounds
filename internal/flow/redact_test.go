@@ -15,12 +15,12 @@ func TestRedact(t *testing.T) {
 		{"ssh -i key.pem host", "ssh -i key.pem host"},
 		{"mycli --password-file ~/pw.txt", "mycli --password-file ~/pw.txt"},
 		{"git checkout 0123456789abcdef0123456789abcdef01234567", "git checkout 0123456789abcdef0123456789abcdef01234567"},
+		{"echo my-key value", "echo my-key value"},
 
 		// flags with values
 		{"mysql --password=hunter2 -u root", "mysql --password=<redacted> -u root"},
 		{"mycli --token abc123 run", "mycli --token <redacted> run"},
 		{"mycli --PASSWORD=x", "mycli --PASSWORD=<redacted>"},
-		{"echo my-key value", "echo my-key value"},
 		{"git log --key value", "git log --key <redacted>"},
 		{`echo "--token abc123"`, `echo "--token <redacted>`},
 		{"Connect-Thing -Password hunter2", "Connect-Thing -Password <redacted>"},
@@ -51,6 +51,28 @@ func TestRedact(t *testing.T) {
 	}
 }
 
+func TestIsFlowCommand(t *testing.T) {
+	yes := []string{
+		"devrounds flow suggest",
+		"DEVROUNDS FLOW suggest",
+		"./devrounds flow save x",
+		"/usr/local/bin/devrounds flow run x",
+		`C:\tools\devrounds.exe FLOW run x`,
+		`.\devrounds.EXE flow status`,
+	}
+	for _, c := range yes {
+		if !isFlowCommand(c) {
+			t.Errorf("isFlowCommand(%q) = false, want true", c)
+		}
+	}
+	no := []string{"devrounds check", "devrounds", "git flow init", `C:\tools\other.exe flow x`, "echo devrounds flow"}
+	for _, c := range no {
+		if isFlowCommand(c) {
+			t.Errorf("isFlowCommand(%q) = true, want false", c)
+		}
+	}
+}
+
 func TestSanitizeSkips(t *testing.T) {
 	for _, raw := range []string{"", "   ", " echo hi", "\techo hi", "devrounds flow suggest", "./devrounds flow save x", `C:\tools\devrounds.exe FLOW run x`} {
 		if got, ok := Sanitize(raw); ok {
@@ -60,7 +82,7 @@ func TestSanitizeSkips(t *testing.T) {
 }
 
 func TestSanitizeKeepsCommands(t *testing.T) {
-	got, ok := Sanitize("  git status\n"[2:])
+	got, ok := Sanitize("git status\n")
 	if !ok || got != "git status" {
 		t.Errorf("got %q, %v", got, ok)
 	}

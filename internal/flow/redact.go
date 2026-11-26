@@ -1,7 +1,6 @@
 package flow
 
 import (
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -19,7 +18,7 @@ var (
 	psEnvRe = regexp.MustCompile(`(?i)(\$env:[A-Za-z0-9_]*` + secretWords + `[A-Za-z0-9_]*\s*=\s*)("[^"]*"|'[^']*'|\S+)`)
 	// API_KEY=value, DB_PASSWORD="value", Authorization="Bearer x"
 	assignRe = regexp.MustCompile(`(?i)\b([A-Za-z0-9_]*` + secretWords + `[A-Za-z0-9_]*)=("[^"]*"|'[^']*'|\S+)`)
-	// --password value, --token=value, -Password value
+	// --password value, --token=value, -Password value (a flag starts a word or follows a quote)
 	flagRe = regexp.MustCompile(`(?i)(^|[\s"'])(--?(?:password|passwd|pwd|pass|token|secret|secret[-_]?key|api[-_]?key|access[-_]?key|auth|authorization|credentials?|bearer|key))([=:\s]+)("[^"]*"|'[^']*'|\S+)`)
 	// Well-known token formats, wherever they appear.
 	knownTokenRe = regexp.MustCompile(`gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|npm_[A-Za-z0-9]{20,}|pypi-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}|sk_(?:live|test)_[A-Za-z0-9]{10,}|sk-[A-Za-z0-9_-]{20,}|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}`)
@@ -52,12 +51,18 @@ func redact(cmd string) string {
 	return cmd
 }
 
+// isFlowCommand reports whether cmd runs "devrounds flow ...". The program name is
+// found by splitting on both / and \ so a Windows path is recognized on every system.
 func isFlowCommand(cmd string) bool {
 	f := strings.Fields(cmd)
 	if len(f) < 2 {
 		return false
 	}
-	name := strings.ToLower(strings.TrimSuffix(filepath.Base(f[0]), ".exe"))
+	exe := f[0]
+	if i := strings.LastIndexAny(exe, `/\`); i >= 0 {
+		exe = exe[i+1:]
+	}
+	name := strings.TrimSuffix(strings.ToLower(exe), ".exe")
 	return name == "devrounds" && strings.EqualFold(f[1], "flow")
 }
 
